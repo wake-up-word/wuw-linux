@@ -1,0 +1,3 @@
+// the configured options and settings for WUW
+#define WUW_VERSION_MAJOR @WUW_VERSION_MAJOR@
+#define WUW_VERSION_MINOR @WUW_VERSION_MINOR@

@@ -1,0 +1,12 @@
+# MacOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# VSCode
+.vscode
+
+## Local
+build
+test
+archive
