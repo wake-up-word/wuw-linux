@@ -4,6 +4,10 @@ https://www.intechopen.com/chapters/15946
 
 # WUW Linux
 Prerequisites
+
+cmake >= 3.8
+gcc >= 10.2.0
+
 ```
 sudo apt install build-essential cmake git
 ```
@@ -17,6 +21,13 @@ mkdir build
 cd build
 cmake ../
 cmake --build .
+```
+# Build with docker
+```
+docker build . -t wuw && \
+CID=$(docker create wuw) && \
+docker cp ${CID}:/app/build ./ && \
+docker rm ${CID}
 ```
 
 # Manually running
@@ -59,21 +70,21 @@ Each feature is trained independently for now.
 
 > TODO train all 3 features at same time (memory error bug)
 ```
-./train_hmm 
+./train_hmm
 -I ./train_input.txt \
 -M ./test.bhmm \
 -s true \
 -t 10 \
 -x 3 1 \
 
-./train_hmm 
+./train_hmm
 -I ./train_input.txt \
 -M ./test.bhmm \
 -s true \
 -t 10 \
 -x 3 2 \
 
-./train_hmm 
+./train_hmm
 -I ./train_input.txt \
 -M ./test.bhmm \
 -s true \
@@ -86,17 +97,17 @@ Each score is generated independently for now.
 
 > TODO score all 3 features at same time (memory error bug)
 ```
-./train_hmm 
+./train_hmm
 -I ./train_input.txt \
 -M ./trained_model_1.bhmm \
 -x 3 1 \
 
-./train_hmm 
+./train_hmm
 -I ./train_input.txt \
 -M ./trained_model_2.bhmm \
 -x 3 2 \
 
-./train_hmm 
+./train_hmm
 -I ./train_input.txt \
 -M ./trained_model_3.bhmm \
 -x 3 3 \
