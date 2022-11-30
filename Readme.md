@@ -23,6 +23,8 @@ cmake ../
 cmake --build .
 ```
 # Build with docker
+
+Build and compile in docker, copy build results to `./build`
 ```
 docker build . -t wuw && \
 CID=$(docker create wuw) && \
@@ -111,4 +113,14 @@ Each score is generated independently for now.
 -I ./train_input.txt \
 -M ./trained_model_3.bhmm \
 -x 3 3 \
+```
+
+
+# Build Example Model "Operator"
+Using Docker
+```
+docker build -f ./Dockerfile.operator_model -t wuw_operator .
+CID=$(docker create wuw_operator) && \
+docker cp ${CID}:/app/out ./ && \
+docker rm ${CID}
 ```
