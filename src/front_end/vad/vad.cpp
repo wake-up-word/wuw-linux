@@ -163,13 +163,16 @@ VAD::VAD(VAD_Config *vadConfig, char* output_basename)
 	genVAD_FEF = vadConfig->genVAD_FEF;
 	fp_vadFEF = NULL;
 	if (genVAD_FEF) {
+		string _output_basename(output_basename);
+		size_t found = _output_basename.find_last_of(".");
+		_output_basename.replace(found,1,"_");
+		
 		char filename[_MAX_PATH];
-		strcpy(filename, output_basename);
-		char * ext = filename + strlen(filename); // setting the pointer to end of wchar string
-		strcpy(ext, ".vadF");
+
+		sprintf(filename, "%s.vad", _output_basename.c_str());
 		fp_vadFEF     = fopen(filename, "wb");
 		if (!fp_vadFEF)
-			fprintf(stderr,"ERROR: Unable to open the file %S\n", filename);
+			fprintf(stderr,"ERROR: Unable to open the file %s\n", filename);
 	}
 	else {
 		svm_model = svm_load_model("models/vad.svm");

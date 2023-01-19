@@ -39,7 +39,7 @@ bool bShowInfScores = false;
 //-----------------------------------------------------------------------------
 void print_usage();
 void print_version();
-bool ProcessSingleFile(char *filename, int featureNum, HmmNetwork *hmm_net, HmmNetwork *hmm_rev, HmmNetwork *hmm_exp);
+bool ProcessSingleFile(char *filename, char *szOutputDir, char *szOutputScoreName, int featureNum, HmmNetwork *hmm_net, HmmNetwork *hmm_rev, HmmNetwork *hmm_exp);
 
 //-----------------------------------------------------------------------------
 // Name: main()
@@ -50,7 +50,9 @@ int main(int argc, char **argv)
     char *szModelFile = NULL;
     char *szInputFile = NULL;
     char *szOutputFile = NULL;
+    char *szOutputScoreName = NULL;
     char *szAlignFile = NULL;
+    char *szOutputDir = NULL;
     bool bInputScript = false;
     int num_iter = 0;
 
@@ -84,6 +86,9 @@ int main(int argc, char **argv)
         case 's':
             szOutputFile = argv[++i];
             break;
+        case 'n':
+            szOutputScoreName = argv[++i];
+            break;
         case 't':
             num_iter = atoi(argv[++i]);
             bDoTraining = true;
@@ -98,6 +103,7 @@ int main(int argc, char **argv)
             break;
         case 'o':
             // bSaveOutput = true;
+            szOutputDir = argv[++i];
             break;
         case 'a':
             bDoAlignment = true;
@@ -171,7 +177,7 @@ int main(int argc, char **argv)
 
         if (!bInputScript) // Process just a single file
         {
-            ProcessSingleFile(szInputFile, featureNum, hmm_net, hmm_rev, hmm_exp);
+            ProcessSingleFile(szInputFile, szOutputDir, szOutputScoreName, featureNum, hmm_net, hmm_rev, hmm_exp);
         }
         else // Process multiple files
         {
@@ -212,7 +218,7 @@ int main(int argc, char **argv)
                 
                 printf("szFullName: %s\n", szFullName);
 
-                if (!ProcessSingleFile(szFullName, featureNum, hmm_net, hmm_rev, hmm_exp))
+                if (!ProcessSingleFile(szFullName, szOutputDir, szOutputScoreName, featureNum, hmm_net, hmm_rev, hmm_exp))
                     goto CLEANUP;
             }
 
@@ -242,6 +248,12 @@ int main(int argc, char **argv)
             
             char model_file_name[80];
             sprintf(model_file_name, "trained_model_%i.bhmm", featureNum);
+            if(szOutputDir != NULL) {
+                std::filesystem::path base = szOutputDir;
+                std::filesystem::path modelFile = base.append(model_file_name);
+                strcpy(model_file_name, modelFile.c_str());
+            }
+
             HmmUtil::SaveBinaryHmm(model1, model_file_name);
         }
 
@@ -268,7 +280,7 @@ CLEANUP:
 // Name: ProcessSingleFile()
 // Desc:
 //-----------------------------------------------------------------------------
-bool ProcessSingleFile(char *filename, int featureNum, HmmNetwork *hmm_net, HmmNetwork *hmm_rev, HmmNetwork *hmm_exp)
+bool ProcessSingleFile(char *filename, char *scoreOutputDir, char*szOutputScoreName, int featureNum, HmmNetwork *hmm_net, HmmNetwork *hmm_rev, HmmNetwork *hmm_exp)
 {
 
     bool exists = std::filesystem::exists(filename);
@@ -375,7 +387,19 @@ bool ProcessSingleFile(char *filename, int featureNum, HmmNetwork *hmm_net, HmmN
             printf("%s,%f,%f,%f\n", filename, s1, s2, s3);
 
             char score_file_name[80];
-            sprintf(score_file_name, "scores_model_%i.txt", featureNum);
+            if(szOutputScoreName == NULL) {
+                sprintf(score_file_name, "scores_model_%i.txt", featureNum);
+            } else {
+                sprintf(score_file_name, "scores_model_%s_%i.txt", szOutputScoreName, featureNum);
+            }
+
+
+            if(scoreOutputDir != NULL) {
+                std::filesystem::path base = scoreOutputDir;
+                std::filesystem::path modelFile = base.append(score_file_name);
+                strcpy(score_file_name, modelFile.c_str());
+            }
+
             FILE * fp;
             fp = fopen (score_file_name, "a");
             fprintf(fp,"%s,%f,%f,%f\n", filename, s1, s2, s3);

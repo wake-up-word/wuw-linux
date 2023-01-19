@@ -122,7 +122,9 @@ FrontEnd::FrontEnd(CfgFrontEnd* cfgFrontEnd)
    Frame_Energy_Floor     = (FLOAT32) exp ((FLOAT64) Frame_Energy_Floor_log/10.0);
 
    // Initialize modules
-   sprintf(filename, "%s\\%s", cfgFrontEnd->out_data_dir, cfgFrontEnd->basefilename);
+   std::filesystem::path base = cfgFrontEnd->out_data_dir;
+   std::filesystem::path file = base.append(cfgFrontEnd->basefilename);
+   strcpy(filename, file.c_str());
    myFE_spectrum = new Spectrum(&cfgFrontEnd->cfgSpectrum,  filename);
    myFE_mfcc     = new MFCC(&cfgFrontEnd->cfgMFCC, filename);
    myFE_lpc_mfcc = new MFCC(&cfgFrontEnd->cfgMFCC, filename);

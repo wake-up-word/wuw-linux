@@ -87,8 +87,9 @@ BackEnd::BackEnd(CfgBackEnd* cfgBackEnd)
 		size_t found = _mw_ALLfef_filename.find_last_of(".");
 		_mw_ALLfef_filename.replace(found,1,"_");
 
-		sprintf(mw_ALLfef_filename, "%s/%s.FEF",
-			mp_cfgBackEnd->out_data_dir, _mw_ALLfef_filename.c_str());
+		std::filesystem::create_directories(mp_cfgBackEnd->out_data_dir);
+
+		sprintf(mw_ALLfef_filename, "%s/%s.FEF", mp_cfgBackEnd->out_data_dir, _mw_ALLfef_filename.c_str());
 		FEF_file = new WUW_IO(mw_ALLfef_filename, true, "wb");
 		FEF_file->SetFEFInfo();
 		FEF_file->Write_FEF_Header("VK_FEF_FILE", header);

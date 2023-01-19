@@ -109,6 +109,14 @@ void run_e_wuw (WuwConfig *configInfo)
    cfgBackEnd->cfgGenFEF    = cfgGenFEF;
    cfgGenFEF->cfgFrontEnd   = cfgFrontEnd;
    cfgTrain->cfgFrontEnd    = cfgFrontEnd;
+
+   bool fileExists = std::filesystem::exists(cfgGenFEF->filelist);
+   if(!fileExists) {
+      char message[_MAX_PATH];
+      sprintf(message, "Cannot find list file: %s\n", cfgGenFEF->filelist);
+      printf(message);
+      throw std::invalid_argument(message);
+   }
    //
    // Opening the list file
    //
@@ -140,24 +148,8 @@ void run_e_wuw (WuwConfig *configInfo)
       // Parsing the line into tokens -- at a moment only one token per line is assumed
       //
       for (vec_it = input_list->begin(); vec_it != input_list->end(); vec_it++) {
-         //wchar_t* wavfile         = cfgInput->filename;
-         string  bslash            = "\\";
-         string  dot               = "\.";
-         string  wavfile;
-         //wstring  wavfile           = cfgGenFEF->in_data_dir + *vec_it;
-         int loc                    =  (*vec_it).find(dot);
-
-         if (vec_it[0] != bslash) 
-            if ( loc == -1) 
-               wavfile           = cfgGenFEF->in_data_dir + *vec_it + ".ulaw";
-            else
-               wavfile           = cfgGenFEF->in_data_dir + *vec_it;
-
-         else 
-            if (loc == -1) 
-               wavfile           = cfgGenFEF->in_data_dir + *vec_it + ".ulaw";
-            else
-               wavfile           = cfgGenFEF->in_data_dir + *vec_it;
+         std::filesystem::path base = cfgGenFEF->in_data_dir;
+         std::filesystem::path wavfile = base.append(*vec_it);
 
          SINT32   bufferSize        = cfgInput->bufferSize;
          SINT32   count             = 0;
@@ -168,7 +160,7 @@ void run_e_wuw (WuwConfig *configInfo)
          // ms_DTW_Score  *score;
 
          strcpy(cfgInput->filename, wavfile.c_str());
-         printf("%s\t", vec_it->c_str());
+         printf("Loading %s\n", vec_it->c_str());
 
          // Parsing output feature file into full path, basefilename and extension
          // int err = _wsplitpath_s(cfgInput->filename, drive, _MAX_DRIVE, dir, _MAX_DIR, fname, _MAX_FNAME, ext, _MAX_EXT); 
@@ -285,14 +277,6 @@ void run_e_wuw (WuwConfig *configInfo)
       }
    }
 }
-//-----------------------------------------------------------------------------
-// Name: FE_Thread
-// Desc: 
-//-----------------------------------------------------------------------------
-int FE_Thread()
-{
-   return -1;
-}
 
 //-----------------------------------------------------------------------------
 // Name: wmain
@@ -340,7 +324,7 @@ int main(int argc, char* argv[])
       }
    }
 
-   wprintf(L"Processing ...\n");
+   printf("Processing ...\n");
 
    // Check start time
    // DWORD dwTime = GetTickCount();

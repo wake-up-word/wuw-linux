@@ -10,15 +10,31 @@ RUN echo $(cmake --version)
 RUN echo $(node --version)
 
 WORKDIR /app
-COPY . .
+
+RUN mkdir temp
+
+# Install libsvm
+
+RUN cd temp && \
+    git clone https://github.com/cjlin1/libsvm.git && \
+    cd libsvm && \
+    make
+
+# Clone training data 
+RUN cd temp && \
+    git clone https://github.com/chriswoodle/wuw-corpus-ii.git --depth 1 && \
+    cd wuw-corpus-ii && \
+    node scripts/verify
+
+COPY src ./src
+COPY CMakeLists.txt ./CMakeLists.txt
 
 RUN mkdir build && \
     cd build && \
     cmake ../ && \
     cmake --build .
 
-# RUN mkdir temp && \
-#     cd temp && \
-#     git clone https://github.com/chriswoodle/wuw-corpus-ii.git  –depth 1
+COPY . .
 
+# Build model
 RUN node ./scripts/build_operator_model.js

@@ -57,7 +57,7 @@ docker rm ${CID}
 
 # Generate binary hmm model
 ```
-./run_gen_hmm 39 30 6 1 2 ./test.bhmm
+./run_gen_hmm 39 30 6 0 1 1 ./test.bhmm
 ```
 > Gen Model
 > 1. Number of phones in wuw (operator 8 /ˈäpəˌrādər/)

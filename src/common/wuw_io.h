@@ -31,6 +31,7 @@ Notes:
 #include <string>
 #include <string.h>
 #include <algorithm>
+#include <filesystem>
 using namespace std;
 
 #include "defines.h" // For BACK_END_TYPE and win32types
