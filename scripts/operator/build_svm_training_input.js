@@ -5,6 +5,8 @@ const {
     hmmTrainingDir,
     svmTrainingDir,
     svmTrainingInput,
+    svmTrainingCSVInputIV,
+    svmTrainingCSVInputOOV,
 } = config;
 
 module.exports = {
@@ -16,7 +18,7 @@ module.exports = {
             const scores_model_iv = {};
             for (let featureNum = 1; featureNum <= 3; featureNum++) {
                 fs.readFileSync(path.resolve(hmmTrainingDir, `scores_model_iv_${featureNum}.txt`)).toString()
-                    .trim()    
+                    .trim()
                     .split('\n')
                     .forEach(line => {
                         const entry = line.split(',');
@@ -29,7 +31,7 @@ module.exports = {
             const scores_model_oov = {};
             for (let featureNum = 1; featureNum <= 3; featureNum++) {
                 fs.readFileSync(path.resolve(hmmTrainingDir, `scores_model_oov_${featureNum}.txt`)).toString()
-                    .trim()    
+                    .trim()
                     .split('\n')
                     .forEach(line => {
                         const entry = line.split(',');
@@ -52,9 +54,22 @@ module.exports = {
                         ['-1', ...(entry.map((v, i) => `${i + 1}:${v}`))].join(' ')
                     )),
             ]
+            fs.writeFileSync(svmTrainingInput, output.join('\n'));
+
             // console.log(output)
 
-            fs.writeFileSync(svmTrainingInput, output.join('\n'));
+            const csv_output_iv = Object.values(scores_model_iv)
+                .map(entry => (
+                    Object.values(entry).join(',')
+                ));
+            fs.writeFileSync(svmTrainingCSVInputIV, csv_output_iv.join('\n'));
+
+            const csv_output_oov = Object.values(scores_model_oov)
+            .map(entry => (
+                Object.values(entry).join(',')
+            ));
+            fs.writeFileSync(svmTrainingCSVInputOOV, csv_output_oov.join('\n'));
+
             console.log(`Building svm training input complete.`)
 
         }

@@ -23,6 +23,7 @@ module.exports = {
 
         const outOfVocabFiles = trainingFiles
             .filter(file => file.utteranceNumber != '001') // Omit "Operator" utterances
+            .filter(file => file.utteranceNumber != '006') // Omit "Operator in sentence" utterances
             .splice(0, 20); // Limit file count
 
         fs.mkdirSync(fefTrainingDir, { recursive: true });

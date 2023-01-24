@@ -1,4 +1,6 @@
 const childProcess = require('child_process');
+const fs = require('fs');
+const path = require('path');
 const config = require('./config');
 const {
     hmmTrainingDir,
@@ -29,6 +31,10 @@ module.exports = {
                 console.log(result)
                 console.log(`Training hmm feature ${featureNum} complete.`)
             }
+
+            fs.copyFileSync(path.resolve(hmmTrainingDir, 'trained_model_1.bhmm'), path.resolve(hmmTrainingDir, 'trained_model_1.m'))
+            fs.copyFileSync(path.resolve(hmmTrainingDir, 'trained_model_2.bhmm'), path.resolve(hmmTrainingDir, 'trained_model_2.l'))
+            fs.copyFileSync(path.resolve(hmmTrainingDir, 'trained_model_3.bhmm'), path.resolve(hmmTrainingDir, 'trained_model_3.e'))
         }
         catch (err) {
             console.log(err)

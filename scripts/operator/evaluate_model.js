@@ -28,7 +28,6 @@ module.exports = {
 
         for (const recording of data) {
             const file = path.resolve(corpusDir, recording)
-            console.log(file)
             command = `${commands.run_wuw} \
                 -i ${file} \
                 -d ./out \
@@ -38,6 +37,9 @@ module.exports = {
                    ${model2} \
                    ${model3} \
             `;
+            console.log(command)
+            console.log()
+
 
             result = childProcess.execSync(command, { stdio: ['pipe', 'pipe', 'ignore'] }).toString();
             console.log(result)

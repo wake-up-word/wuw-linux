@@ -28,6 +28,8 @@ const hmmTrainingOutOfVocabListFile = path.resolve(hmmTrainingDir, 'oov_training
 
 const svmTrainingDir = path.resolve(trainingdir, 'svm');
 const svmTrainingInput = path.resolve(svmTrainingDir, 'svm_input.txt');
+const svmTrainingCSVInputIV = path.resolve(svmTrainingDir, 'svm_input_IV.csv');
+const svmTrainingCSVInputOOV = path.resolve(svmTrainingDir, 'svm_input_OOV.csv');
 const svmModel = path.resolve(svmTrainingDir, 'operator_model.txt');
 
 module.exports = {
@@ -47,6 +49,8 @@ module.exports = {
     hmmTrainingOutOfVocabListFile,
     svmTrainingDir,
     svmTrainingInput,
+    svmTrainingCSVInputIV,
+    svmTrainingCSVInputOOV,
     svmModel,
     dataJson,
     commands: {
