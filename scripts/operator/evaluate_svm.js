@@ -7,6 +7,7 @@ const {
     hmmTrainingDir,
     svmTrainingInput,
     svmModel,
+    svmEvalOutputFile
 } = config;
 
 module.exports = {
@@ -14,24 +15,26 @@ module.exports = {
         let command;
         let result;
         try {
-            console.log(`Training svm model...`)
+            console.log(`Evaluating svm model...`)
 
-            command = `${commands.svmTrain} -g 0.0001 -c 15 \
+            command = `${commands.svmPredict} \
             ${svmTrainingInput} \
-            ${svmModel}
+            ${svmModel} \
+            ${svmEvalOutputFile}
             `;
             console.log('Running:');
             console.log(command);
             result = childProcess.execSync(command, { stdio: ['pipe', 'pipe', 'ignore'] }).toString();
             console.log(result)
 
-            console.log(`Training svm model complete.`)
+            console.log(`Evaluating svm model complete.`)
 
         }
         catch (err) {
             console.log(err)
             console.log('Error Output: ')
             console.log(err.output.toString('utf8'))
+            throw err;
         }
     }
 }

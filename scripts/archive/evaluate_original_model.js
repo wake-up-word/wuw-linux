@@ -3,7 +3,7 @@ const path = require('path');
 const childProcess = require('child_process');
 const util = require('node:util');
 const exec = util.promisify(require('node:child_process').exec);
-const config = require('./config');
+const config = require('../operator/config');
 const {
     fefAllListFile,
     fefOperatorListFile,
@@ -12,8 +12,9 @@ const {
     svmModel,
     hmmTrainingDir,
     dataJson,
-    resultsOutputDir,
-    commands
+    commands,
+    archive,
+    resultsOutputDir
 } = config;
 
 module.exports = {
@@ -28,10 +29,9 @@ module.exports = {
         const data = fs.readFileSync(fefAllListFile).toString().trim().split('\n')
             // .splice(0, 1000); // limit count
 
-        const model1 = path.resolve(hmmTrainingDir, 'trained_model_1.m');
-        const model2 = path.resolve(hmmTrainingDir, 'trained_model_2.l');
-        const model3 = path.resolve(hmmTrainingDir, 'trained_model_3.e');
-
+            const model1 = path.resolve(archive.archiveConfigDir, 'operator3.m');
+            const model2 = path.resolve(archive.archiveConfigDir, 'operator3.l');
+            const model3 = path.resolve(archive.archiveConfigDir, 'operator3.e');
 
         let truePositives = 0;
         let falsePositives = 0;
@@ -43,7 +43,7 @@ module.exports = {
         const evaluating = data.length;
         console.log(`Evaluating ${evaluating} utterances...`)
 
-        const threshold = 0.8;
+        const threshold = 1.1;
         
         const results = await Promise.all(data.map(async (recording) => {
             const file = path.resolve(corpusDir, recording)
@@ -51,7 +51,7 @@ module.exports = {
                 -i ${file} \
                 -d ./out \
                 -o ./fe \
-                -S ${svmModel} ${threshold} 0 \
+                -S ${archive.archiveSvmModel} ${threshold} 0 \
                 -M ${model1} \
                    ${model2} \
                    ${model3} \
@@ -79,7 +79,7 @@ module.exports = {
             }
         }));
 
-        const resultsFile = path.resolve(resultsOutputDir, 'operator_results.txt');
+        const resultsFile = path.resolve(resultsOutputDir, 'legacy_ results.txt');
         fs.writeFileSync(resultsFile, results.join('\n'), { encoding: 'utf8', flag: 'w' })
         console.log({falsePositiveEntries})
         console.log(`Evaluating training data complete with threshold of ${threshold}`);

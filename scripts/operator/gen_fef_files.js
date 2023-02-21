@@ -12,23 +12,31 @@ module.exports = {
     run: () => {
         let command;
         let result;
+        try {
+            console.log("Generating FEF files...");
+            command = `${commands.run_gen_fef} \
+            -G \
+            -L ${fefAllListFile} \
+            -i ${corpusDir} \
+            -o ${fefTrainingFeDir} \
+            -d ${fefTrainingOutDir} \
+            -D
+            `;
 
-        console.log("Generating FEF files...");
-        command = `${commands.run_gen_fef} \
-        -L ${fefAllListFile} \
-        -i ${corpusDir} \
-        -o ${fefTrainingFeDir} \
-        -d ${fefTrainingOutDir} \
-        -D \
-        -v
-        `;
-
-        result = childProcess.execSync(command, { stdio: ['pipe', 'pipe', 'ignore'] }).toString();
-        console.log("Generating FEF files complete.");
-        console.log(result)
+            result = childProcess.execSync(command, { stdio: ['pipe', 'pipe', 'ignore'] }).toString();
+            console.log("Generating FEF files complete.");
+            console.log(result)
+        }
+        catch (err) {
+            console.log(command)
+            console.log(err)
+            console.log('Error Output: ')
+            console.log(err.output.toString('utf8'))
+            throw err;
+        }
     }
 }
 
-if(process.argv[1] == __filename) {
+if (process.argv[1] == __filename) {
     module.exports.run();
 }

@@ -68,6 +68,7 @@ module.exports = {
             console.log(err)
             console.log('Error Output: ')
             console.log(err.output.toString('utf8'))
+            throw err;
         }
     }
 }

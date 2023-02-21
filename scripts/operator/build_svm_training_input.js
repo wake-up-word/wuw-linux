@@ -15,8 +15,14 @@ module.exports = {
             console.log(`Building svm training input...`)
             fs.mkdirSync(svmTrainingDir, { recursive: true });
 
+            // HMM_FEF_TYPE
+            //  HMM_FEF_ENH = 0, 
+            //  HMM_FEF_MFC = 1, 
+            //  HMM_FEF_LPC = 2
+            const featureOrder = [3,1,2] // Magic
+
             const scores_model_iv = {};
-            for (let featureNum = 1; featureNum <= 3; featureNum++) {
+            for (const featureNum of featureOrder) {
                 fs.readFileSync(path.resolve(hmmTrainingDir, `scores_model_iv_${featureNum}.txt`)).toString()
                     .trim()
                     .split('\n')
@@ -29,7 +35,7 @@ module.exports = {
             }
 
             const scores_model_oov = {};
-            for (let featureNum = 1; featureNum <= 3; featureNum++) {
+            for (const featureNum of featureOrder) {
                 fs.readFileSync(path.resolve(hmmTrainingDir, `scores_model_oov_${featureNum}.txt`)).toString()
                     .trim()
                     .split('\n')
@@ -77,6 +83,7 @@ module.exports = {
             console.log(err)
             console.log('Error Output: ')
             console.log(err.output.toString('utf8'))
+            throw err;
         }
     }
 }

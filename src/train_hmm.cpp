@@ -316,9 +316,11 @@ bool ProcessSingleFile(char *filename, char *scoreOutputDir, char*szOutputScoreN
     if (header_size > 0)
         fseek(f, header_size, SEEK_SET);
 
+    FLOAT32 *oRaw = new FLOAT32[numDim];
     FLOAT64 *o = new FLOAT64[numDim];
 
     // TODO loop through numInterlaced
+    // See: WUW_IO::Write_FEF
     // first mfcc
     // second lpc
     // third e(nhanced)mfcc 
@@ -331,10 +333,18 @@ bool ProcessSingleFile(char *filename, char *scoreOutputDir, char*szOutputScoreN
             fseek(f, (featureNum - 1) * numDim * sample_size, SEEK_CUR);
 
         // Read features
-        if (!fread(o, sample_size, numDim, f))
+        if (!fread(oRaw, sample_size, numDim, f))
             break;
+        
+        // print the values of oRaw
+        // printf("oRaw: ");
+        // for(int i = 0; i < numDim; i++) {
+        //     printf("%i: %f ", i, oRaw[i]);
+        // }
+        // printf("\n");
 
         // Handle interlaced files
+        // jump to next segment
         if ((numInterlaced - featureNum) > 0)
             fseek(f, (numInterlaced - featureNum) * numDim * sample_size, SEEK_CUR);
 
@@ -342,12 +352,13 @@ bool ProcessSingleFile(char *filename, char *scoreOutputDir, char*szOutputScoreN
         if (sample_size == 4)
         {
             for (int i = numDim - 1; i >= 0; i--)
-                o[i] = (FLOAT64)(((FLOAT32 *)o)[i]);
+                o[i] = (FLOAT64)oRaw[i];
         }
 
         // HACK skip extra features
         // fseek(f, sizeof(float) * 42 * 2, SEEK_CUR);
 
+        // check for overflow
         for (int d = 0; d < numDim; d++)
         {
             if (abs(o[d]) > 1e4)

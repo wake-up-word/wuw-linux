@@ -122,6 +122,7 @@ BackEnd::BackEnd(CfgBackEnd* cfgBackEnd)
 			numModels = 0;
 
 			// TODO add deallocation of memory
+			// See HMM_FEF_TYPE
 			for(int i = 0; i < 3; i++)
 			{
 				if(cfgBackEnd->cfgHmm.model_filename[i])
@@ -129,6 +130,9 @@ BackEnd::BackEnd(CfgBackEnd* cfgBackEnd)
 					numModels++;
 
 					// Load HMM
+					// i = 0 forward 
+					// i = 1 reversed
+					// i = 2 expanded
 					for(int j = 0; j < 3; j++)
 						hmm_model[i][j] = HmmUtil::LoadBinaryHmm(cfgBackEnd->cfgHmm.model_filename[i]);
 
@@ -314,11 +318,11 @@ void *BackEnd::Run(FE_FEATURES * in_features)
 	me_fe_vad_state                  = mp_fe_feature_vecs->vad_state;
 	// ms_dtw_m_scores                  = NULL;
 
-	if (mb_genAllFEF_flag) {
-		FEF_file->WriteBinary(pf32_fe_mfcc_features_buffer, sizeof(FLOAT32), num_fe_mfcc_features-3);
-		FEF_file->WriteBinary(pf32_fe_lpc_mfcc_features_buffer, sizeof(FLOAT32), num_fe_mfcc_features-3);
-		FEF_file->WriteBinary(pf32_fe_enh_mfcc_features_buffer, sizeof(FLOAT32), num_fe_enh_mfcc_features-3);
-	}
+	// if (mb_genAllFEF_flag) {
+	// 	FEF_file->WriteBinary(pf32_fe_mfcc_features_buffer, sizeof(FLOAT32), num_fe_mfcc_features-3);
+	// 	FEF_file->WriteBinary(pf32_fe_lpc_mfcc_features_buffer, sizeof(FLOAT32), num_fe_mfcc_features-3);
+	// 	FEF_file->WriteBinary(pf32_fe_enh_mfcc_features_buffer, sizeof(FLOAT32), num_fe_enh_mfcc_features-3);
+	// }
 
 	mu32_FrameCounter++;
 
@@ -326,7 +330,7 @@ void *BackEnd::Run(FE_FEATURES * in_features)
 	{
 		case VAD_ON:
 		{
-			// printf("VAD ON ");
+			// printf("VAD ON \n");
 			mb_vad_on_flag = true;
 			mb_vad_off_flag = false;
 
@@ -355,6 +359,7 @@ void *BackEnd::Run(FE_FEATURES * in_features)
 					// Set up new HMM scoring sequence
 					if(mu16_WordFrameCounter == 0)
 					{
+						// See HMM_FEF_TYPE
 						for(int i = 0; i < 3; i++)
 						{
 							if(hmm_net[i][0])
@@ -416,7 +421,7 @@ void *BackEnd::Run(FE_FEATURES * in_features)
 		}
 		case VAD_OFF:
 		{
-			// printf("VAD OFF ");
+			// printf("VAD OFF \n");
 			mb_vad_off_flag = true;
 			if (mb_vad_on_flag)
 			{
@@ -442,13 +447,18 @@ void *BackEnd::Run(FE_FEATURES * in_features)
 					case HMM_CD:
 					{
 						int c = 0;
+						// See HMM_FEF_TYPE
 						for(int i = 0; i < 3; i++)
 						{
 							if(hmm_net[i][0])
 							{
 								for(int j = 0; j < 3; j++)
 								{
+									// [ HMM_FEF_ENH Forward, HMM_FEF_ENH Reversed, HMM_FEF_ENH Enhanced,
+									//   HMM_FEF_MFC Forward, HMM_FEF_MFC Reversed, HMM_FEF_MFC Enhanced,
+									//   HMM_FEF_LPC Forward, HMM_FEF_LPC Reversed, HMM_FEF_LPC Enhanced ]
 									svm_features[c].value = hmm_net[i][j]->GetRecoScore();
+									printf("svm_features [%i]: [%5.1f]\n", c, svm_features[c].value);
 									c++;
 								}
 							}
@@ -500,6 +510,37 @@ void *BackEnd::Run(FE_FEATURES * in_features)
 				//if ((ms_dtw_m_scores->for_matchII < F_DTWII_MATCH) &&
 				//   (ms_dtw_m_scores->revM_matchII > R_DTWII_MATCH)) {
 				//}
+
+				
+				// Print ascii fef
+				if(false) {
+					string _mw_fef_filename(mp_cfgBackEnd->basefilename);
+						size_t found = _mw_fef_filename.find_last_of(".");
+						_mw_fef_filename.replace(found,1,"_");
+					sprintf(mw_fef_filename, "%s/%s_%02d_ascii.fef",
+					  mp_cfgBackEnd->out_data_dir, _mw_fef_filename.c_str(), mu16_NumVADCounter++);
+					
+					WUW_IO fef_printseg(mw_fef_filename, sizeof(ST_FLOAT32), m_SegFeatureVecs.num_feature_vectors, "w");
+					
+					for (int i=0; i<m_SegFeatureVecs.num_feature_vectors; i++) {
+					  fef_printseg.Printf(L"[%3d][%3d] mfcc ", mu32_FrameCounter, i);
+					  for (int j=0; j<m_SegFeatureVecs.num_mfcc_features; j++) {
+					     fef_printseg.Printf(L"%u ", m_SegFeatureVecs.fe_mfcc_features_buffer[i][j]);
+					  }
+					  fef_printseg.Printf(L"\n");
+					   fef_printseg.Printf(L"[%3d][%3d] lpc  ", mu32_FrameCounter, i);
+					  for (int j=0; j<m_SegFeatureVecs.num_mfcc_features; j++) {
+					     fef_printseg.Printf(L"%u ", m_SegFeatureVecs.fe_lpc_mfcc_features_buffer[i][j]);
+					  }
+					  fef_printseg.Printf(L"\n");
+					  fef_printseg.Printf(L"[%3d][%3d] enh  ", mu32_FrameCounter, i);
+					  for (int j=0; j<m_SegFeatureVecs.num_enh_features; j++) {
+					     fef_printseg.Printf(L"%u ", m_SegFeatureVecs.fe_enh_mfcc_features_buffer[i][j]);
+					  }
+					  fef_printseg.Printf(L"\n");
+					}
+				}
+
 				if ((mb_train_flag) || (mb_genFEF_flag))
 				{
 					//if ((mu16_WordFrameCounter > min_WUW_length) &&
@@ -528,23 +569,33 @@ void *BackEnd::Run(FE_FEATURES * in_features)
 					fef_segment.Write_FEF(&m_SegFeatureVecs);
 
 					vad_file->Printf(L"%d\n", 1000*mu32_FrameCounter/(mp_cfgBackEnd->cfgFrontEnd->frame_rate));
-					//swprintf_s(mw_fef_filename, _MAX_PATH, L"%s/%s_%02d_ascii.fef",
-					//   mp_trainCfg->out_data_dir, mp_trainCfg->basefilename, mu16_NumVADCounter++);
-					//
-					//WUW_IO fef_printseg(mw_fef_filename, false, L"w");
-					//
-					//for (int i=0; i<m_SegFeatureVecs.num_feature_vectors; i++) {
-					//   fef_printseg.Printf(L"[%3d][%3d] ", mu32_FrameCounter, i);
+				
+					// // Print ascii fef
+					// string _mw_fef_filename(mp_cfgBackEnd->basefilename);
+					// 	size_t found = _mw_fef_filename.find_last_of(".");
+					// 	_mw_fef_filename.replace(found,1,"_");
+					// sprintf(mw_fef_filename, "%s/%s_%02d_ascii.fef",
+					//   mp_cfgBackEnd->out_data_dir, _mw_fef_filename.c_str(), mu16_NumVADCounter++);
+					
+					// WUW_IO fef_printseg(mw_fef_filename, sizeof(ST_FLOAT32), m_SegFeatureVecs.num_feature_vectors, "w");
+					
+					// for (int i=0; i<m_SegFeatureVecs.num_feature_vectors; i++) {
+					//   fef_printseg.Printf(L"[%3d][%3d] mfcc", mu32_FrameCounter, i);
 					//   for (int j=0; j<m_SegFeatureVecs.num_mfcc_features; j++) {
 					//      fef_printseg.Printf(L"%e ", m_SegFeatureVecs.fe_mfcc_features_buffer[i][j]);
 					//   }
 					//   fef_printseg.Printf(L"\n");
-					//   fef_printseg.Printf(L"[%3d][%3d] ", mu32_FrameCounter, i);
+					//    fef_printseg.Printf(L"[%3d][%3d] lpc ", mu32_FrameCounter, i);
+					//   for (int j=0; j<m_SegFeatureVecs.num_mfcc_features; j++) {
+					//      fef_printseg.Printf(L"%e ", m_SegFeatureVecs.fe_lpc_mfcc_features_buffer[i][j]);
+					//   }
+					//   fef_printseg.Printf(L"\n");
+					//   fef_printseg.Printf(L"[%3d][%3d] enh ", mu32_FrameCounter, i);
 					//   for (int j=0; j<m_SegFeatureVecs.num_enh_features; j++) {
 					//      fef_printseg.Printf(L"%e ", m_SegFeatureVecs.fe_enh_mfcc_features_buffer[i][j]);
 					//   }
 					//   fef_printseg.Printf(L"\n");
-					//}
+					// }
 					ClearSegment();
 					//}
 					mu16_NumVADCounter++;

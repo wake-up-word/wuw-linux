@@ -543,6 +543,14 @@ bool WUW_IO::WriteBinary(const void* p, size_t size, size_t count)
     return (false);
   }
 
+   // print out values of p
+   // for (int i=0; i<count; i++) {
+   //   printf("%f ", ((float *)p)[i]);
+   // }
+   // printf("\n");
+
+   // printf("size = %d, count = %d\n", size, count);
+   
   if ((wcount = fwrite(p, size, count, m_f)) != count) {
     perror("SYSMSG:");
     fwprintf(stderr, L"ERROR: %S\nWritting to file:\n\tFILE: %s\n\tExpected %d items, written %d\n",

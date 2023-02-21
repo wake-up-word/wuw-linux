@@ -2687,7 +2687,7 @@ svm_model *svm_load_model(const char *model_file_name)
 {
 	FILE *fp = fopen(model_file_name,"rb");
 	if(fp==NULL) {
-		perror("Error occurred while opening file.\n");
+		perror("Error occurred while opening svm model file.\n");
 		printf("%s\n", model_file_name);
 		return NULL;
 	}

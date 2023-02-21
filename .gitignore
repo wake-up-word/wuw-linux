@@ -10,4 +10,5 @@
 build
 test
 archive
+!scripts/archive
 temp
