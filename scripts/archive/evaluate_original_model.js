@@ -43,7 +43,7 @@ module.exports = {
         const evaluating = data.length;
         console.log(`Evaluating ${evaluating} utterances...`)
 
-        const threshold = 1.1;
+        const threshold = 0.6;
         
         const results = await Promise.all(data.map(async (recording) => {
             const file = path.resolve(corpusDir, recording)

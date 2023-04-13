@@ -6,6 +6,9 @@ build_list_files.run();
 const build_gen_fef_files = require('./operator/gen_fef_files');
 build_gen_fef_files.run();
 
+const create_hmm_training_list_files = require('./operator/create_hmm_training_list_files');
+create_hmm_training_list_files.run();
+
 const gen_empty_hmm = require('./operator/gen_empty_hmm');
 gen_empty_hmm.run();
 

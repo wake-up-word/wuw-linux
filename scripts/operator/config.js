@@ -39,6 +39,8 @@ const svmEvalOutputFile = path.resolve(svmTrainingDir, 'evaluate_results.txt');
 const archiveDir = path.resolve(root, 'archive');
 const archiveConfigDir = path.resolve(archiveDir, 'config');
 const archiveSvmModel = path.resolve(archiveConfigDir, 'operator3.s');
+// const archiveWindowsWUW = path.resolve(archiveDir, 'demo', 'run_e-wuw.exe');
+const archiveWindowsWUW = path.resolve(`C:/Users/chris/git/wuw-windows/Win32/Debug/run_e-wuw.exe`);
 
 const resultsOutputDir = path.resolve(temp, 'results');
 module.exports = {
@@ -75,7 +77,8 @@ module.exports = {
     archive: {
         archiveDir,
         archiveConfigDir,
-        archiveSvmModel
+        archiveSvmModel,
+        archiveWindowsWUW
     }
 }
 

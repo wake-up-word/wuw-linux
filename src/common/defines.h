@@ -701,7 +701,7 @@ struct CfgWUW
                                                      // SVM VAD
 #define VAD_ON_LEAD                (UINT16)(5)       //(15)
 #define VAD_ON_MIN_COUNT           (UINT16)(10)      //(10)
-#define VAD_OFF_MIN_COUNT          (UINT16)(15)      //(15)      //(40) // (35) (15)
+#define VAD_OFF_MIN_COUNT          (UINT16)(20)      //(20)      //(40) // (35) (15)
 #define VAD_OFF_TRAIL              (UINT16)(5)       //(20)      //(10)       // (5)
 
 #define ENERGY_FLOOR               (FLOAT32)(200.0)  //(1.0)     // (50.0)

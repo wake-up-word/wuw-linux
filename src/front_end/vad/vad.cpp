@@ -175,11 +175,13 @@ VAD::VAD(VAD_Config *vadConfig, char* output_basename)
 			fprintf(stderr,"ERROR: Unable to open the file %s\n", filename);
 	}
 	else {
-		svm_model = svm_load_model("models/vad.svm");
-		if(!svm_model)
-			printf("Failed to load VAD SVM model\n");
 
-		svm_features[6].index = -1;
+		// TODO deprecate
+		// svm_model = svm_load_model("models/vad.svm");
+		// if(!svm_model)
+		// 	printf("Failed to load VAD SVM model\n");
+
+		// svm_features[6].index = -1;
 	}
 
 }
