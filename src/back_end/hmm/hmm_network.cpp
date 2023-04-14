@@ -1330,17 +1330,18 @@ void HmmNetwork::ComputeDurationStats()
 	FLOAT64 mean = 0.0;
 	FLOAT64 var = 0.0;
 
-	FILE* f = fopen("durations.txt", "wt");
+    // DISABLE writing to file
+	//FILE* f = fopen("durations.txt", "wt");
 
 	for(int m = 0; m < i16_num_seq; m++)
 	{
 		mean += m_seq[m].size();
 		var  += m_seq[m].size() * m_seq[m].size();
 
-		fprintf(f, "%d\n", m_seq[m].size());
+		//fprintf(f, "%d\n", m_seq[m].size());
 	}
 
-	fclose(f);
+	//fclose(f);
 
 	mean = mean / i16_num_seq;
 	var = var / i16_num_seq;
