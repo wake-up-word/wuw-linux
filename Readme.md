@@ -124,3 +124,11 @@ CID=$(docker create wuw_operator) && \
 docker cp ${CID}:/app/out ./ && \
 docker rm ${CID}
 ```
+
+# Reference
+
+Këpuska, Veton. (2011). Wake-Up-Word Speech Recognition. 10.5772/16242.
+
+# License
+
+Data is licensed under Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)
